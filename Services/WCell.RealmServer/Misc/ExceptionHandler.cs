@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Cell.Core.Collections;
 using WCell.Core.Initialization;
 using WCell.RealmServer.Chat;
@@ -65,7 +66,7 @@ namespace WCell.RealmServer.Misc
 
 		private static void NotifyException(string msg, Exception ex)
 		{
-			foreach (var chr in World.GetAllCharacters())
+			foreach (var chr in World.GetAllCharacters().AsParallel())
 			{
 				if (chr.Role >= ExceptionNotificationRank)
 				{

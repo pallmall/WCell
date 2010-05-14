@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using NLog;
 using WCell.Constants.Factions;
@@ -788,16 +789,21 @@ namespace WCell.RealmServer.NPCs
 		{
 			SpawnEntry closest = null;
 			var distanceSq = Single.MaxValue;
-			foreach (var spawn in SpawnEntriesByMap[(int)pos.RegionId])
+		    var l = new object(); // lock object
+			foreach (var spawn in SpawnEntriesByMap[(int)pos.RegionId].AsParallel())
 			{
 				if (spawn != null)
 				{
 					var distSq = pos.Position.GetDistanceSquared(spawn.Position);
-					if (distSq < distanceSq)
-					{
-						distanceSq = distSq;
-						closest = spawn;
-					}
+
+                    lock (l)
+                    {
+                        if (distSq < distanceSq)
+                        {
+                            distanceSq = distSq;
+                            closest = spawn;
+                        }
+                    }
 				}
 			}
 			return closest;
