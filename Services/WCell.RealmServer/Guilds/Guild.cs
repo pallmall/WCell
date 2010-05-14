@@ -476,7 +476,7 @@ namespace WCell.RealmServer.Guilds
 		/// <returns>new rank</returns>
 		public GuildRank AddRank(string name, GuildPrivileges privileges, bool update)
 		{
-			foreach (var gRank in m_ranks)
+			foreach (var gRank in m_ranks.AsParallel())
 			{
 				if (gRank.Name == name)
 					return null;
@@ -527,7 +527,7 @@ namespace WCell.RealmServer.Guilds
 
 				var lastRankId = m_ranks.Count - 1;
 
-				foreach (var gm in Members.Values)
+				foreach (var gm in Members.Values.AsParallel())
 				{
 					if (gm.RankId == lastRankId) // promote
 						gm.RankId = lastRankId - 1;
@@ -559,7 +559,7 @@ namespace WCell.RealmServer.Guilds
 		/// <param name="update">if true, sends event to the guild</param>
 		public void ChangeRank(int rankId, string newName, GuildPrivileges newPrivileges, bool update)
 		{
-			foreach (var gr in m_ranks)
+			foreach (var gr in m_ranks.AsParallel())
 			{
 				if ((gr.Name == newName) && (gr.RankIndex != rankId))
 					return;
@@ -634,7 +634,7 @@ namespace WCell.RealmServer.Guilds
 		{
 			get
 			{
-				foreach (var member in Members.Values)
+				foreach (var member in Members.Values.AsParallel())
 				{
 					if (member.Id == lowMemberId)
 						return member;
@@ -655,7 +655,7 @@ namespace WCell.RealmServer.Guilds
 			{
 				name = name.ToLower();
 
-				foreach (var member in Members.Values)
+				foreach (var member in Members.Values.AsParallel())
 				{
 					if (member.Name.ToLower() == name)
 						return member;
@@ -1050,7 +1050,7 @@ namespace WCell.RealmServer.Guilds
 		/// <param name="ignoredCharacter">the <see cref="Character" /> that won't receive the packet</param>
 		public void SendAll(RealmPacketOut packet, Character ignoredCharacter)
 		{
-			foreach (var member in Members.Values)
+			foreach (var member in Members.Values.AsParallel())
 			{
 				var character = member.Character;
 
@@ -1081,7 +1081,7 @@ namespace WCell.RealmServer.Guilds
 
 		public void SendSystemMsg(string msg)
 		{
-			foreach (var member in Members.Values)
+			foreach (var member in Members.Values.AsParallel())
 			{
 				if (member.Character != null)
 					member.Character.SendSystemMessage(msg);
@@ -1122,7 +1122,7 @@ namespace WCell.RealmServer.Guilds
 		/// </summary>
 		public void Send(RealmPacketOut packet)
 		{
-			foreach (var chr in GetCharacters())
+			foreach (var chr in GetCharacters().AsParallel())
 			{
 				chr.Client.Send(packet);
 			}
@@ -1145,7 +1145,7 @@ namespace WCell.RealmServer.Guilds
 		/// </summary>
 		public void SendToChatListeners(RealmPacketOut packet)
 		{
-			foreach (var chr in GetChatListeners())
+			foreach (var chr in GetChatListeners().AsParallel())
 			{
 				chr.Client.Send(packet);
 			}
@@ -1168,7 +1168,7 @@ namespace WCell.RealmServer.Guilds
 		/// </summary>
 		public void SendToOfficers(RealmPacketOut packet)
 		{
-			foreach (var chr in GetOfficerCharacters())
+			foreach (var chr in GetOfficerCharacters().AsParallel())
 			{
 				chr.Client.Send(packet);
 			}
