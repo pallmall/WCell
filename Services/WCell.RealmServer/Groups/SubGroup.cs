@@ -139,7 +139,7 @@ namespace WCell.RealmServer.Groups
 		{
 			get
 			{
-				foreach (var member in m_members)
+				foreach (var member in m_members.AsParallel())
 				{
 					if (member.Id == lowMemberId)
 					{
@@ -156,7 +156,7 @@ namespace WCell.RealmServer.Groups
 			{
 				var capName = name.ToLower();
 
-				foreach (var member in m_members)
+				foreach (var member in m_members.AsParallel())
 				{
 					if (member.Name.ToLower() == capName)
 						return member;
@@ -188,15 +188,14 @@ namespace WCell.RealmServer.Groups
 		/// <param name="ignored">the member that won't receive the packet</param>
 		public void Send(RealmPacketOut packet, GroupMember ignored)
 		{
-			Character charMember;
 			m_group.SyncRoot.EnterReadLock();
 			try
 			{
-				foreach (var member in m_members)
+				foreach (var member in m_members.AsParallel())
 				{
 					if (member != ignored)
 					{
-						charMember = member.Character;
+						var charMember = member.Character;
 
 						if (charMember != null)
 						{

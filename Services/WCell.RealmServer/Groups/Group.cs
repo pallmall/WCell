@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using NLog;
 using WCell.Constants;
@@ -659,9 +660,10 @@ namespace WCell.RealmServer.Groups
 
 			try
 			{
-				foreach (var subGroup in m_subGroups)
+			    var l = new object();
+				foreach (var subGroup in m_subGroups.AsParallel())
 				{
-					foreach (var member in subGroup.Members)
+					foreach (var member in subGroup.Members) // let's just go with one parallel loop
 					{
 						var chr = member.Character;
 						if (chr != null)
@@ -671,7 +673,8 @@ namespace WCell.RealmServer.Groups
 							SendGroupDestroyed(chr);
 						}
 
-						OnMemberRemoved(member);
+                        lock (l)
+    						OnMemberRemoved(member);
 					}
 				}
 			}
@@ -714,11 +717,9 @@ namespace WCell.RealmServer.Groups
 				m_syncLock.EnterReadLock();
 				try
 				{
-					GroupMember member = null;
-
-					foreach (SubGroup groupUnit in m_subGroups)
+					foreach (SubGroup groupUnit in m_subGroups.AsParallel())
 					{
-						member = groupUnit[name];
+						var member = groupUnit[name];
 
 						if (member != null)
 							return member;
@@ -869,7 +870,8 @@ namespace WCell.RealmServer.Groups
 			{
 				Character chr;
 
-				foreach (var groupUnit in m_subGroups)
+                // TODO: this plinq needs double-checking, likely won't work out of the box
+				foreach (var groupUnit in m_subGroups.AsParallel())
 				{
 					foreach (var member in groupUnit.Members)
 					{
@@ -962,7 +964,7 @@ namespace WCell.RealmServer.Groups
 		/// <param name="ignored">Member that won't receive the message</param>
 		protected virtual void SendAll(RealmPacketOut packet, GroupMember ignored)
 		{
-			foreach (var groupUnit in m_subGroups)
+			foreach (var groupUnit in m_subGroups.AsParallel())
 			{
 				groupUnit.Send(packet, ignored);
 			}
@@ -1205,9 +1207,9 @@ namespace WCell.RealmServer.Groups
 			m_syncLock.EnterReadLock();
 			try
 			{
-				foreach (SubGroup unit in SubGroups)
+				foreach (SubGroup unit in SubGroups.AsParallel())
 				{
-					foreach (GroupMember member in unit)
+					foreach (GroupMember member in unit.AsParallel())
 					{
 						if (member.Character != null)
 						{
@@ -1232,9 +1234,9 @@ namespace WCell.RealmServer.Groups
 			m_syncLock.EnterReadLock();
 			try
 			{
-				foreach (var unit in SubGroups)
+				foreach (var unit in SubGroups.AsParallel())
 				{
-					foreach (var member in unit)
+					foreach (var member in unit.AsParallel())
 					{
 						if (member.Id == lowId)
 						{
@@ -1323,7 +1325,7 @@ namespace WCell.RealmServer.Groups
 		/// </summary>
 		public void Send(RealmPacketOut packet)
 		{
-			foreach (var chr in GetCharacters())
+			foreach (var chr in GetCharacters().AsParallel())
 			{
 				chr.Client.Send(packet);
 			}
@@ -1422,7 +1424,7 @@ namespace WCell.RealmServer.Groups
 			if (member.Group != this)
 				return;
 
-			foreach (var chr in GetCharacters())
+			foreach (var chr in GetCharacters().AsParallel())
 			{
 				if (chr != member.Character && chr != null
 					&& !chr.IsInUpdateRange(member.Character)
