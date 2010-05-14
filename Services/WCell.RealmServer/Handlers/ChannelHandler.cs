@@ -14,6 +14,7 @@
  *
  *************************************************************************/
 
+using System.Linq;
 using WCell.Constants;
 using WCell.Constants.Chat;
 using WCell.Core;
@@ -928,7 +929,7 @@ namespace WCell.RealmServer.Handlers
 		/// <param name="packet">the packet to send</param>
 		public static void SendPacketToChannel(ChatChannel chan, RealmPacketOut packet)
 		{
-			foreach (var member in chan.Members.Values)
+			foreach (var member in chan.Members.Values.AsParallel())
 			{
 				member.User.Send(packet);
 			}
@@ -942,7 +943,7 @@ namespace WCell.RealmServer.Handlers
 		/// <param name="sender">sender (to check the ignore list)</param>
 		public static void SendPacketToChannel(ChatChannel chan, RealmPacketOut packet, EntityId sender)
 		{
-			foreach (var member in chan.Members.Values)
+			foreach (var member in chan.Members.Values.AsParallel())
 			{
 				if (!RelationMgr.Instance.HasRelation(member.User.EntityId.Low, sender.Low, CharacterRelationType.Ignored))
 				{

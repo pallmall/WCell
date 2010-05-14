@@ -523,7 +523,7 @@ namespace WCell.RealmServer.Chat
 
 		public void Send(RealmPacketOut packet)
 		{
-			foreach (var user in GetUsers())
+			foreach (var user in GetUsers().AsParallel())
 			{
 				user.Send(packet);
 			}

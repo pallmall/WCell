@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using WCell.Constants;
 using WCell.Constants.Chat;
@@ -126,7 +127,7 @@ namespace WCell.RealmServer.Chat
 			{
 				using (var packetOut = CreateCharChatMessage(type, language, sender.EntityId, sender.EntityId, null, msg, sender.ChatTag))
 				{
-					foreach (var chr in World.GetAllCharacters())
+					foreach (var chr in World.GetAllCharacters().AsParallel())
 					{
 						chr.Send(packetOut);
 					}
@@ -561,7 +562,7 @@ namespace WCell.RealmServer.Chat
 		{
 			using (var packet = CreateCharChatMessage(ChatMsgType.System, ChatLanguage.Universal, EntityId.Zero, EntityId.Zero, null, message, ChatTag.None))
 			{
-				foreach (var target in targets)
+				foreach (var target in targets.AsParallel())
 				{
 					if (target != null)
 					{
