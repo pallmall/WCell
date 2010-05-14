@@ -229,17 +229,22 @@ namespace WCell.RealmServer.Taxi
 			PathNode closest = null;
 			var distSq = Single.MaxValue;
 
+		    var l = new object();
 			foreach (var node in PathNodesById)
 			{
 				if (node == null)
 					continue;
 
 				var temp = node.Position.GetDistanceSquared(ref pos);
-				if (temp < distSq)
-				{
-					distSq = temp;
-					closest = node;
-				}
+
+                lock (l)
+                {
+                    if (temp < distSq)
+                    {
+                        distSq = temp;
+                        closest = node;
+                    }
+                }
 			}
 
 			return closest;

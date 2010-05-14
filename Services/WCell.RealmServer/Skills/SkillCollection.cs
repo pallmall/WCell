@@ -116,7 +116,7 @@ namespace WCell.RealmServer.Skills
 
 		public void UpdateSkillsForLevel(int level)
 		{
-			foreach (var sk in m_skills.Values)
+			foreach (var sk in m_skills.Values.AsParallel())
 			{
 				if (sk.SkillLine.Category == SkillCategory.WeaponProficiency)
 				{
