@@ -218,7 +218,7 @@ namespace WCell.RealmServer.Commands
 				if (trigger.Text.HasNext)
 				{
 					var searchTerm = trigger.Text.Remainder;
-					guilds = GuildMgr.GuildsById.Values.Where(gld => gld.Name.ContainsIgnoreCase(searchTerm));
+					guilds = GuildMgr.GuildsById.Values.AsParallel().Where(gld => gld.Name.ContainsIgnoreCase(searchTerm));
 				}
 				else
 				{

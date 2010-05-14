@@ -210,7 +210,7 @@ namespace WCell.RealmServer.Commands
 
 				if (itemName.Length >= MIN_SEARCH_CHARS)
 				{
-					var itemsFound = ItemMgr.Templates.Where(item => item != null &&
+					var itemsFound = ItemMgr.Templates.AsParallel().Where(item => item != null &&
 						(item.Names.Localize(locale).IndexOf(itemName, StringComparison.InvariantCultureIgnoreCase) >= 0));
 
 					var i = 0;
@@ -247,7 +247,7 @@ namespace WCell.RealmServer.Commands
 				if (mod == "l")
 				{
 					var text = trigger.Text.Remainder.Trim();
-					var enchants = EnchantMgr.EnchantmentEntryReader.Entries.Values.Where(
+					var enchants = EnchantMgr.EnchantmentEntryReader.Entries.Values.AsParallel().Where(
 						enchant => enchant.Description.IndexOf(text, StringComparison.InvariantCultureIgnoreCase) > -1);
 
 					trigger.Reply("{0} Enchantments found", enchants.Count());

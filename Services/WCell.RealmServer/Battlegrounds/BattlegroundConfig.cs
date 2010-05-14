@@ -17,7 +17,7 @@ namespace WCell.RealmServer.Battlegrounds
 			get
 			{
 				IEnumerable<BattlegroundTemplate> templates 
-					= BattlegroundMgr.Templates.Where(info => 
+					= BattlegroundMgr.Templates.AsParallel().Where(info => 
 							info != null && info.Id > BattlegroundId.None &&
 					        info.Id < BattlegroundId.End && info.Id != BattlegroundId.AllArenas
 						);

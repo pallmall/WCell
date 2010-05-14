@@ -268,7 +268,7 @@ namespace WCell.RealmServer.Commands
 			public override void Process(CmdTrigger<RealmServerCmdArgs> trigger)
 			{
 				var searchTerms = trigger.Text.Remainder.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-				var templates = QuestMgr.Templates.Where(templ => templ != null &&
+				var templates = QuestMgr.Templates.AsParallel().Where(templ => templ != null &&
 					searchTerms.Iterate(term => !templ.Title.ContainsIgnoreCase(term)));
 
 				var count = templates.Count();

@@ -34,7 +34,7 @@ namespace WCell.RealmServer.NPCs
         /// <param name="id">Mob's ID</param>
         public static NPCAiText[] GetEntry(uint id)
         {
-            return Entries.Where(entry => entry.Value.GetMobId() == id).Select(entry => entry.Value).ToArray();
+            return Entries.AsParallel().Where(entry => entry.Value.GetMobId() == id).Select(entry => entry.Value).ToArray();
         }
         /// <summary>
         /// Select entries by preposition of yelled text (on any localization)
@@ -43,7 +43,7 @@ namespace WCell.RealmServer.NPCs
         public static NPCAiText[] GetEntry(string str)
         {
             return
-                Entries.Where(entry => entry.Value.Texts.Any(text => text.StartsWith(str))).Select(entry => entry.Value)
+                Entries.AsParallel().Where(entry => entry.Value.Texts.Any(text => text.StartsWith(str))).Select(entry => entry.Value)
                     .ToArray();
         }
         #endregion
