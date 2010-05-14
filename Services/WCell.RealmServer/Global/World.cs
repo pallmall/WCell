@@ -1070,7 +1070,7 @@ namespace WCell.RealmServer.Global
 			var regions = GetAllRegions();
 			var rgnCount = regions.Count();
 			var i = 0;
-			foreach (var rgn in regions)
+			foreach (var rgn in regions.AsParallel())
 			{
 				if (rgn.CharacterCount > 0)
 				{
@@ -1100,7 +1100,7 @@ namespace WCell.RealmServer.Global
 		public static void CallOnAllChars(Action<Character> action)
 		{
 			var regions = GetAllRegions();
-			foreach (var rgn in regions)
+			foreach (var rgn in regions.AsParallel())
 			{
 				if (rgn.CharacterCount > 0)
 				{
@@ -1125,7 +1125,7 @@ namespace WCell.RealmServer.Global
 			var regions = GetAllRegions();
 			var rgnCount = regions.Count();
 			var i = 0;
-			foreach (var rgn in regions)
+			foreach (var rgn in regions.AsParallel())
 			{
 				rgn.AddMessage(() =>
 				{
@@ -1148,7 +1148,7 @@ namespace WCell.RealmServer.Global
 		public static void CallOnAllRegions(Action<Region> action)
 		{
 			var regions = GetAllRegions();
-			foreach (var rgn in regions)
+			foreach (var rgn in regions.AsParallel())
 			{
 				rgn.AddMessage(() =>
 				{

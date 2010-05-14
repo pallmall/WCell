@@ -2148,7 +2148,8 @@ namespace WCell.RealmServer.Global
 			GameObject closest = null;
 			float distanceSq = int.MaxValue, currentDistanceSq;
 
-			foreach (var go in m_gos)
+		    var l = new object();
+			foreach (var go in m_gos.AsParallel())
 			{
 				if (go == null || go.Entry.GOId != goId)
 				{
@@ -2157,11 +2158,15 @@ namespace WCell.RealmServer.Global
 
 				currentDistanceSq = go.GetDistanceSq(ref pos);
 
-				if (currentDistanceSq < distanceSq)
-				{
-					distanceSq = currentDistanceSq;
-					closest = go;
-				}
+                // optimistic; prevent racing and hope for the best
+                lock (l)
+                {
+                    if (currentDistanceSq < distanceSq)
+                    {
+                        distanceSq = currentDistanceSq;
+                        closest = go;
+                    }
+                }
 			}
 
 			return closest;
@@ -2179,7 +2184,8 @@ namespace WCell.RealmServer.Global
 			NPC closest = null;
 			float distanceSq = int.MaxValue, currentDistanceSq;
 
-			foreach (var obj in m_objects.Values)
+		    var l = new object();
+			foreach (var obj in m_objects.Values.AsParallel())
 			{
 				if (obj is NPC && ((NPC)obj).Entry.NPCId == id)
 				{
@@ -2188,11 +2194,15 @@ namespace WCell.RealmServer.Global
 
 				currentDistanceSq = obj.GetDistanceSq(ref pos);
 
-				if (currentDistanceSq < distanceSq)
-				{
-					distanceSq = currentDistanceSq;
-					closest = (NPC)obj;
-				}
+                // optimistic; prevent racing and hope for the best
+                lock (l)
+                {
+                    if (currentDistanceSq < distanceSq)
+                    {
+                        distanceSq = currentDistanceSq;
+                        closest = (NPC)obj;
+                    }
+                }
 			}
 
 			return closest;
@@ -2209,15 +2219,21 @@ namespace WCell.RealmServer.Global
 
 			NPC closestHealer = null;
 			int distanceSq = int.MaxValue, currentDistanceSq;
-			foreach (var healer in m_spiritHealers)
+
+		    var l = new object();
+			foreach (var healer in m_spiritHealers.AsParallel())
 			{
 				currentDistanceSq = healer.GetDistanceSqInt(ref pos);
 
-				if (currentDistanceSq < distanceSq)
-				{
-					distanceSq = currentDistanceSq;
-					closestHealer = healer;
-				}
+                // optimistic; prevent racing and hope for the best
+                lock (l)
+                {
+                    if (currentDistanceSq < distanceSq)
+                    {
+                        distanceSq = currentDistanceSq;
+                        closestHealer = healer;
+                    }
+                }
 			}
 
 			return closestHealer;
@@ -2244,7 +2260,7 @@ namespace WCell.RealmServer.Global
 		/// </summary>
 		public GameObject GetGOWithSpellFocus(Vector3 pos, SpellFocus focus, float radius, uint phase)
 		{
-			foreach (GameObject go in GetObjectsInRadius(ref pos, radius, ObjectTypes.GameObject, phase, 0))
+			foreach (GameObject go in GetObjectsInRadius(ref pos, radius, ObjectTypes.GameObject, phase, 0).AsParallel())
 			{
 				if (go.Entry is GOSpellFocusEntry && ((GOSpellFocusEntry)go.Entry).SpellFocus == focus)
 				{
