@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NLog;
 using WCell.Constants;
 using WCell.Constants.Factions;
@@ -116,7 +117,7 @@ namespace WCell.RealmServer.Factions
 		/// </summary>
 		public void ResendAllFactions()
 		{
-			foreach (var rep in m_byIndex.Values)
+			foreach (var rep in m_byIndex.Values.AsParallel())
 			{
 				FactionHandler.SendReputationStandingUpdate(m_owner.Client, rep);
 			}

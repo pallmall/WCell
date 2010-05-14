@@ -114,7 +114,7 @@ namespace WCell.RealmServer.GameObjects
 
 				new GOPortalEntry().FinalizeDataHolder();
 
-				foreach (var entry in Entries.Values)
+				foreach (var entry in Entries.Values.AsParallel())
 				{
 					if (entry.LinkedTrapId > 0)
 					{
@@ -269,19 +269,24 @@ namespace WCell.RealmServer.GameObjects
 				return templates.First();
 			}
 
-			foreach (var template in templates)
+		    var l = new object();
+			foreach (var template in templates.AsParallel())
 			{
 				if (template == null || template.RegionId != pos.RegionId)
 				{
 					continue;
 				}
 
-				var distSq = pos.Position.GetDistanceSquared(template.Pos);
-				if (distSq < closestDistSq)
-				{
-					closestDistSq = distSq;
-					closest = template;
-				}
+                var distSq = pos.Position.GetDistanceSquared(template.Pos);
+                // we're a little optimistic here
+                lock (l)
+                {
+                    if (distSq < closestDistSq)
+                    {
+                        closestDistSq = distSq;
+                        closest = template;
+                    }
+                }
 			}
 			return closest;
 		}

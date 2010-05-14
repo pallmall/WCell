@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using WCell.Constants.Spells;
 using WCell.Constants.Updates;
 using WCell.RealmServer.Entities;
@@ -51,14 +52,17 @@ namespace WCell.RealmServer.GameObjects
 
 			var sqDist = float.MaxValue;
 			GameObject sel = null;
-			foreach (GameObject go in gos)
+		    var l = new object();
+			foreach (GameObject go in gos.AsParallel())
 			{
 				// TODO: Go by angle instead of distance
 				//var angle = chr.GetAngleTowards(go);
 				if (sel == null ||
 					(go.IsInFrontOf(chr) && chr.GetDistanceSq(go) < sqDist))
 				{
-					sel = go;
+                    // for precision; better get the 100% correct one (there's a race here)
+                    lock (l)
+    					sel = go;
 				}
 			}
 
