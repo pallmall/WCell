@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cell.Core;
 using WCell.Constants;
 using WCell.Constants.World;
@@ -105,7 +106,7 @@ namespace WCell.RealmServer.Instances
 
 		public void ClearBindings()
 		{
-			foreach (var bindings in m_bindings)
+			foreach (var bindings in m_bindings.AsParallel())
 			{
 				if (bindings != null)
 				{
@@ -149,7 +150,7 @@ namespace WCell.RealmServer.Instances
 
 			lock (bindings)
 			{
-				foreach (var binding in bindings)
+				foreach (var binding in bindings.AsParallel())
 				{
 					if (binding.RegionId == map)
 					{
@@ -241,7 +242,7 @@ namespace WCell.RealmServer.Instances
 			var bindings = m_bindings[(int)BindingType.Hard];
 			if (bindings != null)
 			{
-				foreach (var binding in bindings)
+				foreach (var binding in bindings.AsParallel())
 				{
 					listener.SendMessage("Raid {0} #{1}, Until: {1}", binding.RegionId, binding.InstanceId, binding.NextResetTime);
 				}
