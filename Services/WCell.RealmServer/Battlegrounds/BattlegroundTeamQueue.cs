@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using WCell.Constants;
 using WCell.RealmServer.Entities;
 using System.Threading;
@@ -74,7 +75,7 @@ namespace WCell.RealmServer.Battlegrounds
 					}
 
 					// make sure there are no deserters
-					foreach(Character groupChr in chrs)
+					foreach (Character groupChr in chrs.AsParallel())
 					{
 						if (groupChr != null && groupChr.Battlegrounds.IsDeserter)
 						{

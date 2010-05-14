@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using NLog;
 using WCell.Constants;
 using WCell.Constants.Spells;
@@ -270,7 +271,7 @@ namespace WCell.RealmServer.Battlegrounds
 		{
 			_shutdownTimer.Start(seconds);
 
-			foreach (var chr in m_characters)
+			foreach (var chr in m_characters.AsParallel())
 			{
 				chr.Auras.Cancel(_preparationSpell);
 			}
@@ -289,7 +290,7 @@ namespace WCell.RealmServer.Battlegrounds
 
 									if (_preparationSpell != null)
 									{
-										foreach (Character chr in m_characters)
+										foreach (Character chr in m_characters.AsParallel())
 										{
 											chr.SpellCast.TriggerSelf(_preparationSpell);
 										}
@@ -309,7 +310,7 @@ namespace WCell.RealmServer.Battlegrounds
 				{
 					_startTime = DateTime.Now;
 					_status = BattlegroundStatus.Active;
-					foreach (var chr in m_characters)
+					foreach (var chr in m_characters.AsParallel())
 					{
 						chr.Auras.Cancel(_preparationSpell);
 					}
@@ -504,7 +505,7 @@ namespace WCell.RealmServer.Battlegrounds
 
 		public void SendPvpData()
 		{
-			foreach (var chr in m_characters)
+			foreach (var chr in m_characters.AsParallel())
 			{
 				BattlegroundHandler.SendPvpData(chr, chr.Battlegrounds.Team.Side, this);
 			}

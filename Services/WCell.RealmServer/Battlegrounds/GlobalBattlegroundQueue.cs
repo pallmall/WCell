@@ -30,7 +30,7 @@ namespace WCell.RealmServer.Battlegrounds
 			set
 			{
 				defaultBGCreationPlayerThresholdPct = value;
-				foreach (var template in BattlegroundMgr.Templates)
+				foreach (var template in BattlegroundMgr.Templates.AsParallel())
 				{
 					if (template != null)
 					{
@@ -105,7 +105,7 @@ namespace WCell.RealmServer.Battlegrounds
 
 		public Battleground GetBattleground(uint instanceId)
 		{
-			foreach (var bg in Instances)
+			foreach (var bg in Instances.AsParallel())
 			{
 				if (bg.InstanceId == instanceId)
 				{
