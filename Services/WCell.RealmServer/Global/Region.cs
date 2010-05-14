@@ -621,7 +621,7 @@ namespace WCell.RealmServer.Global
 				if (m_IsAIFrozen != value)
 				{
 					m_IsAIFrozen = value;
-					foreach (var obj in m_objects.Values)
+					foreach (var obj in m_objects.Values.AsParallel())
 					{
 						if (obj is NPC)
 						{
